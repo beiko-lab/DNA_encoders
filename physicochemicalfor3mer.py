@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
-from my_pseknc import pseknc
+from my_pseknc import Pseknc
 from base_for_encoders import BaseForEncoder
 import os.path as osp
 import os
 
-class PhysicochemicalFor3mer(pseknc, BaseForEncoder):
+class PhysicochemicalFor3mer(Pseknc, BaseForEncoder):
 
 
     def __init__(self, classes=None, max_samples=1008, combine_class_samples=True,

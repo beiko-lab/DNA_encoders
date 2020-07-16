@@ -1,6 +1,6 @@
 import numpy as np
 
-class pseknc():
+class Pseknc():
 
     def __init__(self,L=58):
 
@@ -140,10 +140,6 @@ class pseknc():
             big_theta_sum=0
             for i in range(1,(self.L-j-1)):
                 #subtracting 1 to access the index of array seq_into_oligonucs_index
-                #print('\n')
-                #print(len(seq_into_oligonucs_index))
-                #print(i-1)
-                #print(i+j-1)
                 big_theta_sum += self.big_theta(seq_into_oligonucs_index[i-1],seq_into_oligonucs_index[i+j-1])
 
             # j-1 is used to access since position 1 (equ. index=0) of the array
@@ -154,8 +150,6 @@ class pseknc():
     def encode_into_pseknc(self,seq):
         seq_into_oligonucs_index, normal_freq_of_kmers = self.encode_into_kmers(seq)
         # w_theta is w * small_theta
-        #print("len of seq {}".format(len(seq)))
-        #print("len of seq_into_oligonucs_index {}".format(len(seq_into_oligonucs_index)))
         w_theta = self.w * self.small_theta(seq_into_oligonucs_index)
         feature_vector = (np.concatenate((normal_freq_of_kmers,w_theta))/(np.sum(normal_freq_of_kmers)+np.sum(w_theta)))
         return feature_vector
