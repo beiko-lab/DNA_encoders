@@ -2,21 +2,7 @@
 
 This package has the following encoders for DNA sequences:
 
-* pc3mer (Physicochemical per 3-mers)
-* k-mers for a constant k or k within an interval
-
-It reads a [fasta](https://en.wikipedia.org/wiki/FASTA_format) file and saves the encoded sequence into another file.
-
-
-## Table of contents
-* [Input format](#input-format)
-* [pc3mer](#pc3mer)
-* [k-mers](#k-mers)
-* [Usage examples](#Usage examples)
-
-
-
-## Input format
+***
 
 The DNA sequence must be in [fasta](https://en.wikipedia.org/wiki/FASTA_format) with lines of fixed length and extension 
 _.fna_ or _.fasta_. Example:
@@ -34,6 +20,15 @@ CAGTTATTTACCTTACTTTACGCGCGCGTAACTCTGGCAACATCACTACAGGATAGCG
 AAAAAGTTATACGCGGTGGAAACATTGCCCGGATAGTCTATAGTCACTAAGCATTAAA
 ...
 ```
+
+After choosing the wanted encoder, the files with encoded sequences will be stored at 
+_folder_for_output_/output/_encoder_name_/
+
+## Encoders
+* [Pc3mer](#pc3mer)
+* [Pc3mer stats](#pc3mer)
+* [PseKNC](#pseknc)
+* [k-mers](#k-mers)
 
 ## Pc3mer
 Using (add ref)'s table mapping 3-mers to a value for each one of the twelve physicochemical properties, we 
@@ -57,14 +52,16 @@ Example 1:
   * 'Trinucleotide GC Content': 0.57735027
   * Etc.
 * (Step 2) For each property, replace each 3-mer by its value for that property and store as _Pc3mer/property.md_. 
-  * For Bendability-DNAse, the encoded sequence starts with: [0.07230364, 0.26511335, ..., sample_class]
-  * For Bendability-consensus, the encoded sequence starts with: [0.3577835, -0.0969693, ..., sample_class]
-  * For Trinucleotide GC Content, the encoded sequence starts with: [1.73205081, 0.57735027, .., sample_class]
+  * For Bendability-DNAse, the encoded sequence starts with: ```[0.07230364, 0.26511335, ..., sample_class]```
+  * For Bendability-consensus, the encoded sequence starts with: ```[0.3577835, -0.0969693, ..., sample_class]```
+  * For Trinucleotide GC Content, the encoded sequence starts with: ```[1.73205081, 0.57735027, .., sample_class]```
   * Etc.
 * When the individual files are combined, make sure to delete the _sample_class_ for all the properties, but
   the last one, so the encoded sequence look like:
+  ```
    [0.07230364, 0.26511335, ..., 0.3577835, -0.0969693, ..., 1.73205081, 0.57735027, ..., sample_class]
-
+  ```
+  
 Example 2:
 * Entry in the fasta file: 
 ```bash
@@ -73,7 +70,9 @@ GCTGAAAATACGTTGAACGCTTACCGTCGCGATCTGTCAATGATGGTGGAGTGGTTGC
 ```
 
 * Sequence encoded with Bendability-consensus:
+```
 0.919537039821516,0.919537039821516,1.3475397297384397,-0.605222559882525,-2.745236029467144,-2.745236029467144, -2.584735019498298,0.5717848498890153,-0.0702191899863703,0.06353164998766837,0.06353164998766837,..., Sigma++
+```
 
 Usage:
 ```python
@@ -94,7 +93,7 @@ for one of the properties. Examples: output/Pc3mer/Bendability-consensus.md and 
 
 
 ## k-mers
-## Usage examples
+
 
 
 
