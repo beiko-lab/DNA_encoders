@@ -22,15 +22,15 @@ The DNA sequence must be in [fasta](https://en.wikipedia.org/wiki/FASTA_format) 
 _.fna_ or _.fasta_. Example:
 
 ```bash
->1
+>Sigma++
 GGTTTATTGCCTTGCAGCTGGCGAGAGACGGTATTGCTCATGCACAAGCCTTGTTCAG
->2
+>Sigma24
 TGCCCTGACTTCACCCCGCTGTGTCTGCTTTTCCCGACTATTCTTAATGAGCTTCGAT
->3
+>Sigma--
 AATGTGGATAGATATGAATTATTTTTCTCCTTAAGGATCATCCGTTATTTGGGTCGTT
->4
+>Sigma70
 CAGTTATTTACCTTACTTTACGCGCGCGTAACTCTGGCAACATCACTACAGGATAGCG
->5
+>Sigma++
 AAAAAGTTATACGCGGTGGAAACATTGCCCGGATAGTCTATAGTCACTAAGCATTAAA
 ...
 ```
@@ -61,13 +61,16 @@ Example 1:
   * For Bendability-consensus, the encoded sequence starts with: [0.3577835, -0.0969693, ..., sample_class]
   * For Trinucleotide GC Content, the encoded sequence starts with: [1.73205081, 0.57735027, .., sample_class]
   * Etc.
-* When the individual files are combined, the encoded sequence will look like:
+* When the individual files are combined, make sure to delete the _sample_class_ for all the properties, but
+  the last one, so the encoded sequence look like:
    [0.07230364, 0.26511335, ..., 0.3577835, -0.0969693, ..., 1.73205081, 0.57735027, ..., sample_class]
 
 Example 2:
 * Entry in the fasta file: 
+```bash
 >Sigma++
 GCTGAAAATACGTTGAACGCTTACCGTCGCGATCTGTCAATGATGGTGGAGTGGTTGC
+```
 
 * Sequence encoded with Bendability-consensus:
 0.919537039821516,0.919537039821516,1.3475397297384397,-0.605222559882525,-2.745236029467144,-2.745236029467144, -2.584735019498298,0.5717848498890153,-0.0702191899863703,0.06353164998766837,0.06353164998766837,..., Sigma++

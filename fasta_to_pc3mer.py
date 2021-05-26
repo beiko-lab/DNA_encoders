@@ -76,7 +76,7 @@ class FastaToPc3mer():
         if folder_for_output is None:
             folder_for_output = self.folder_for_output
 
-        folder_for_output = os.path.join(folder_for_output + "Pc3mer_stats")
+        folder_for_output = os.path.join(folder_for_output, "Pc3mer_stats")
         os.makedirs(folder_for_output, exist_ok=True)
 
         for prop in self.props:
