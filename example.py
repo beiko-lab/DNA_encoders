@@ -1,24 +1,22 @@
-from fasta_to_physicochemicalprops_ import FastaToPhysicochemical3mers
+from fasta_to_pc3mer import FastaToPc3mer
 from my_pseknc import Pseknc
 from kmers import Kmers
-
+import os
 
 input_file_path = "input_file.fasta"
-folder_for_output = "./output/"
-encoder = FastaToPhysicochemical3mers(folder_for_output=folder_for_output)
-
+folder_for_output = os.path.join(os.getcwd(), "output")
 
 """
 Converting fasta file into physicochemical properties 
 """
-encoder = FastaToPhysicochemical3mers(folder_for_output=folder_for_output)
-encoder.convert_to_physicochemical_properties(input_file_path)
+encoder = FastaToPc3mer(folder_for_output=folder_for_output)
+encoder.convert_to_pc3mer(input_file_path)
 
 """
 Converting fasta file into physicochemical statistics 
 """
-encoder = FastaToPhysicochemical3mers(folder_for_output=folder_for_output)
-encoder.convert_to_physicochemical_stats(input_file_path)
+encoder = FastaToPc3mer(folder_for_output=folder_for_output)
+encoder.convert_to_pc3mer_stats(input_file_path)
 
 
 """
