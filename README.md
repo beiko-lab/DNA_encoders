@@ -1,8 +1,11 @@
 # DNA encoders
 
-This package has the following encoders for DNA sequences:
+This package can encode DNA sequences into:
 
-***
+* Pc3mer
+* Pc3mer stats
+* PseKNC
+* K-mers
 
 The DNA sequence must be in [fasta](https://en.wikipedia.org/wiki/FASTA_format) with lines of fixed length and extension 
 _.fna_ or _.fasta_. Example:
@@ -28,15 +31,12 @@ _folder_for_output_/output/_encoder_name_/
 * [Pc3mer](#pc3mer)
 * [Pc3mer stats](#pc3mer-stats)
 * [PseKNC](#pseknc)
-* [k-mers](#k-mers)
+* [K-mers](#k-mers)
 
 ## Pc3mer
-Using [[1]](#1) and [[2]](#2) table to map 3-mers to a value for each one of the twelve physicochemical properties, we 
-standardize the values and calculate pc3mer by decomposing the input sequence into 3-mers and then replacing each 
-3-mers by its value for a given physicochemical property.
+Using table from [[1]](#1) that maps 3-mers to a value for each one of the twelve physicochemical properties, we standardize the values and calculate pc3mer by decomposing the input sequence into 3-mers and then replacing each 3-mers by its value for a given physicochemical property.
 
-The properties names are Bendability-DNAse, Bendability-consensus, Trinucleotide GC Content, Nucleosome positioning, 
-Consensus_roll, Consensus_Rigid, Dnase I, Dnase I-Rigid, MW-Daltons, MW-kg, Nucleosome, Nucleosome-Rigid (add ref).
+The properties names are Bendability-DNAse, Bendability-consensus, Trinucleotide GC Content, Nucleosome positioning, Consensus_roll, Consensus_Rigid, Dnase I, Dnase I-Rigid, MW-Daltons, MW-kg, Nucleosome, Nucleosome-Rigid (add ref).
 
 Example 1:
 * Sequence: GGGA...
@@ -112,7 +112,20 @@ encoder.convert_to_pc3mer_stats(input_fasta)
 ```
 
 ## PseKNC
-PseKNC [[1]](#1), [[2]](#2), which decomposes the sequence into k-mers and maps them to physicochemical property values specific for each word that is used to calculate scores. The scores, called Theta_{i}, are concatenated to the k-mer decomposition and refers to all k-mers _i_ nucleotides distant from each other in the sequence.
+This implementation of PseKNC I [[1]](#1), [[2]](#2) decomposes the sequence into 3-mers and maps them to physicochemical property values specific for each word that is used to calculate scores. The scores, called Theta_{i}, are concatenated to the 3-mer decomposition and refers to all 3-mers _i_, for _i_ in [1, 2], nucleotides distant in the sequence.
+
+Usage:
+```python
+from my_pseknc import Pseknc
+import os
+
+input_fasta = "input_file.fasta" # path + file name
+folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
+outputFile = os.path.join(folder_for_output, "/pseknc.csv")
+
+encoder = Pseknc()
+encoder.encode_fasta_into_pseknc(input_fasta, outputFile)
+```
 
 
 ## k-mers
@@ -137,5 +150,7 @@ encoded = encoder.convertFastaIntoSeveralKmers(input_fasta, k_values, outputFile
 ```
 
 ## References
-<a id="1">[1]</a> W. Chen, X. Zhang, J. Brooker, H. Lin, L. Zhang, and K.-C. Chou, “PseKNC-General: a cross-platform package for generating various modes of pseudo nucleotide compositions,” Bioinformatics, vol. 31, no. 1, pp. 119–120, Jan. 2015, doi: 10.1093/bioinformatics/btu602.
-<a id="2">[2]</a> W. Chen, T. Y. Lei, D. C. Jin, H. Lin, and K. C. Chou, “PseKNC: A flexible web server for generating pseudo K-tuple nucleotide composition,” Anal. Biochem., vol. 456, no. 1, pp. 53–60, 2014, doi: 10.1016/j.ab.2014.04.001.
+<a id="1">[1]</a> W. Chen, T. Y. Lei, D. C. Jin, H. Lin, and K. C. Chou, “PseKNC: A flexible web server for generating pseudo K-tuple nucleotide composition,” Anal. Biochem., vol. 456, no. 1, pp. 53–60, 2014, doi: 10.1016/j.ab.2014.04.001.
+
+<a id="2">[2]</a> W. Chen, X. Zhang, J. Brooker, H. Lin, L. Zhang, and K.-C. Chou, “PseKNC-General: a cross-platform package for generating various modes of pseudo nucleotide compositions,” Bioinformatics, vol. 31, no. 1, pp. 119–120, Jan. 2015, doi: 10.1093/bioinformatics/btu602.
+
