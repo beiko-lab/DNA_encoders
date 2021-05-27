@@ -26,12 +26,12 @@ _folder_for_output_/output/_encoder_name_/
 
 ## Encoders
 * [Pc3mer](#pc3mer)
-* [Pc3mer stats](#pc3mer)
+* [Pc3mer stats](#pc3mer-stats)
 * [PseKNC](#pseknc)
 * [k-mers](#k-mers)
 
 ## Pc3mer
-Using (add ref)'s table mapping 3-mers to a value for each one of the twelve physicochemical properties, we 
+Using [[1]](#1) and [[2]](#2) table to map 3-mers to a value for each one of the twelve physicochemical properties, we 
 standardize the values and calculate pc3mer by decomposing the input sequence into 3-mers and then replacing each 
 3-mers by its value for a given physicochemical property.
 
@@ -77,12 +77,11 @@ GCTGAAAATACGTTGAACGCTTACCGTCGCGATCTGTCAATGATGGTGGAGTGGTTGC
 Usage:
 ```python
 from fasta_to_pc3mer import FastaToPc3mer
-from my_pseknc import Pseknc
-from kmers import Kmers
 import os
 
 input_fasta = "input_file.fasta" # path + file name
 folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
+
 encoder = FastaToPc3mer(folder_for_output=folder_for_output)
 encoder.convert_to_pc3mer(input_fasta)
 ```
@@ -91,9 +90,52 @@ Output:
 It creates the folder "Pc3mer" in _folder_for_output_ and twelve _.md_ files, each one containing the fasta file encoded
 for one of the properties. Examples: output/Pc3mer/Bendability-consensus.md and output/Pc3mer/Dnase I.md.
 
+## Pc3mer stats
+Encode a sequence into pc3mer and then get a set of statistics over the encoded sequence. The statistics are:
+* minimum, 
+* maximum,
+* mean,
+* standard deviation,
+* median, and 
+* variance. 
+
+Usage:
+```python
+from fasta_to_pc3mer import FastaToPc3mer
+import os
+
+input_fasta = "input_file.fasta" # path + file name
+folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
+
+encoder = FastaToPc3mer(folder_for_output=folder_for_output)
+encoder.convert_to_pc3mer_stats(input_fasta)
+```
+
+## PseKNC
+PseKNC [[1]](#1), [[2]](#2), which decomposes the sequence into k-mers and maps them to physicochemical property values specific for each word that is used to calculate scores. The scores, called Theta_{i}, are concatenated to the k-mer decomposition and refers to all k-mers _i_ nucleotides distant from each other in the sequence.
+
 
 ## k-mers
+It counts the frequency of k-mers, an enumeration of all “words” of length _k_, for k in a given interval, in a sequence of DNA. For instance, for k in [2, 2] there are 4^k = 4^2 = 16 possible words: {AA, AC, AG, AT, CA, CC, CG, CT, GA, GC, GG, GT, TA, TC, TG, TT}.
 
+Usage:
+```python
+from kmers import Kmers
+import os
 
+# defining list of ks
+k_start = 1
+k_end = 5
+k_values = list(range(k_start, k_end+1))
 
+input_fasta = "input_file.fasta" # path + file name
+folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
+outputFile = os.path.join(folder_for_output, f"/{k_start}_to_{k_end}_mers.csv")
 
+encoder = Kmers()
+encoded = encoder.convertFastaIntoSeveralKmers(input_fasta, k_values, outputFile)
+```
+
+## References
+<a id="1">[1]</a> W. Chen, X. Zhang, J. Brooker, H. Lin, L. Zhang, and K.-C. Chou, “PseKNC-General: a cross-platform package for generating various modes of pseudo nucleotide compositions,” Bioinformatics, vol. 31, no. 1, pp. 119–120, Jan. 2015, doi: 10.1093/bioinformatics/btu602.
+<a id="2">[2]</a> W. Chen, T. Y. Lei, D. C. Jin, H. Lin, and K. C. Chou, “PseKNC: A flexible web server for generating pseudo K-tuple nucleotide composition,” Anal. Biochem., vol. 456, no. 1, pp. 53–60, 2014, doi: 10.1016/j.ab.2014.04.001.
