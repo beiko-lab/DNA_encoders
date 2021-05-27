@@ -7,8 +7,7 @@ This package can encode DNA sequences into:
 * PseKNC
 * K-mers
 
-The DNA sequence must be in [fasta](https://en.wikipedia.org/wiki/FASTA_format) with lines of fixed length and extension 
-_.fna_ or _.fasta_. Example:
+The DNA sequence must be in [fasta](https://en.wikipedia.org/wiki/FASTA_format) format with lines of 58 nucleotides and extension _.fna_ or _.fasta_. Example:
 
 ```bash
 >Sigma++
@@ -24,8 +23,7 @@ AAAAAGTTATACGCGGTGGAAACATTGCCCGGATAGTCTATAGTCACTAAGCATTAAA
 ...
 ```
 
-After choosing the wanted encoder, the files with encoded sequences will be stored at 
-_folder_for_output_/output/_encoder_name_/
+After encoding the sequences, the algorithm stores them at _folder_for_output_/output/_encoder_name_/.
 
 ## Encoders
 * [Pc3mer](#pc3mer)
@@ -34,30 +32,29 @@ _folder_for_output_/output/_encoder_name_/
 * [K-mers](#k-mers)
 
 ## Pc3mer
-Using table from [[1]](#1) that maps 3-mers to a value for each one of the twelve physicochemical properties, we standardize the values and calculate pc3mer by decomposing the input sequence into 3-mers and then replacing each 3-mers by its value for a given physicochemical property.
+Using a table [[1]](#1) with twelve physicochemical properties values for each 3-mers, we standardize the values and calculate pc3mer by decomposing the input sequence into 3-mers and replacing each 3-mers in the order they appear in the sequence by its value for a given physicochemical property.
 
-The properties names are Bendability-DNAse, Bendability-consensus, Trinucleotide GC Content, Nucleosome positioning, Consensus_roll, Consensus_Rigid, Dnase I, Dnase I-Rigid, MW-Daltons, MW-kg, Nucleosome, Nucleosome-Rigid (add ref).
+The physicochemical properties are Bendability-DNAse, Bendability-consensus, Trinucleotide GC Content, Nucleosome positioning, Consensus_roll, Consensus_Rigid, Dnase I, Dnase I-Rigid, MW-Daltons, MW-kg, Nucleosome, and Nucleosome-Rigid [[1]](#1).
 
 Example 1:
 * Sequence: GGGA...
-* (Step 1) Decomposing it into 3-mers: GGG, GGA, ...
+* (Algorithm's step 1) It decomposes the sequence into 3-mers: GGG, GGA, ...
 * Standardized physicochemical properties for GGG: 
-  * 'Bendability-DNAse': 0.07230364, 
+  * 'Bendability-DNAse': 0.07230364 
   * 'Bendability-consensus': 0.3577835
   * 'Trinucleotide GC Content': 1.73205081
   * Etc.
 * Standardized physicochemical properties for GGA:
-  * 'Bendability-DNAse': 0.26511335, 
+  * 'Bendability-DNAse': 0.26511335
   * 'Bendability-consensus': -0.0969693
   * 'Trinucleotide GC Content': 0.57735027
   * Etc.
-* (Step 2) For each property, replace each 3-mer by its value for that property and store as _Pc3mer/property.md_. 
-  * For Bendability-DNAse, the encoded sequence starts with: ```[0.07230364, 0.26511335, ..., sample_class]```
-  * For Bendability-consensus, the encoded sequence starts with: ```[0.3577835, -0.0969693, ..., sample_class]```
-  * For Trinucleotide GC Content, the encoded sequence starts with: ```[1.73205081, 0.57735027, .., sample_class]```
+* (Algorithm's step 2) For each property, it replaces each 3-mer by its value for that property and stores as _Pc3mer/<property_name>.md_. 
+  * For Bendability-DNAse, the encoded sequence will look like: ```[0.07230364, 0.26511335, ..., sample_class]```
+  * For Bendability-consensus, the encoded sequence will look like: ```[0.3577835, -0.0969693, ..., sample_class]```
+  * For Trinucleotide GC Content, the encoded sequence will look like: ```[1.73205081, 0.57735027, .., sample_class]```
   * Etc.
-* When the individual files are combined, make sure to delete the _sample_class_ for all the properties, but
-  the last one, so the encoded sequence look like:
+* When combining the individual files, make sure to delete the _sample_class_ column for all properties but the last one, so the encoded sequence look like:
   ```
    [0.07230364, 0.26511335, ..., 0.3577835, -0.0969693, ..., 1.73205081, 0.57735027, ..., sample_class]
   ```
@@ -87,11 +84,10 @@ encoder.convert_to_pc3mer(input_fasta)
 ```
 
 Output:
-It creates the folder "Pc3mer" in _folder_for_output_ and twelve _.md_ files, each one containing the fasta file encoded
-for one of the properties. Examples: output/Pc3mer/Bendability-consensus.md and output/Pc3mer/Dnase I.md.
+It creates the folder "Pc3mer" in _<folder_for_output>_ and twelve _.md_ files, each one containing the encoded sequences for one of the properties. Examples: output/Pc3mer/Bendability-consensus.md and output/Pc3mer/Dnase I.md.
 
 ## Pc3mer stats
-Encode a sequence into pc3mer and then get a set of statistics over the encoded sequence. The statistics are:
+Encodes a sequence into pc3mer and then get a set of statistics over the encoded sequence. The statistics are:
 * minimum, 
 * maximum,
 * mean,
@@ -112,7 +108,7 @@ encoder.convert_to_pc3mer_stats(input_fasta)
 ```
 
 ## PseKNC
-This implementation of PseKNC I [[1]](#1), [[2]](#2) decomposes the sequence into 3-mers and maps them to physicochemical property values specific for each word that is used to calculate scores. The scores, called Theta_{i}, are concatenated to the 3-mer decomposition and refers to all 3-mers _i_, for _i_ in [1, 2], nucleotides distant in the sequence.
+This implementation of PseKNC I [[1]](#1), [[2]](#2) decomposes the sequence into 3-mers and maps them to physicochemical property values specific for each word that is used to calculate scores. The scores, called Theta_{i}, are concatenated to the 3-mer decomposition and refers to all 3-mers _i_ nucleotides distant from each other, for _i_ in [1, 2]. The final array is devided by the sum of 3-mers counts and Theta scores.
 
 Usage:
 ```python
@@ -129,8 +125,25 @@ encoder.encode_fasta_into_pseknc(input_fasta, outputFile)
 
 
 ## k-mers
-It counts the frequency of k-mers, an enumeration of all “words” of length _k_, for k in a given interval, in a sequence of DNA. For instance, for k in [2, 2] there are 4^k = 4^2 = 16 possible words: {AA, AC, AG, AT, CA, CC, CG, CT, GA, GC, GG, GT, TA, TC, TG, TT}.
+It counts the frequency of k-mers, an enumeration of all “words” of length _k_, for k in a given interval, in the DNA sequence. 
 
+Example 1: 
+* For _k_ in [2, 2] there are 4^k = 4^2 = 16 possible words: 
+  ```{AA, AC, AG, AT, CA, CC, CG, CT, GA, GC, GG, GT, TA, TC, TG, TT}```
+* Sequence: GGGA
+* Decomposing into k-mers: GG, GG, GA
+* Algorithm's output:
+  ```[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0]```
+
+
+Example 2:
+* For _k_ in [1, 2] there are 4^1 + 4^2 = 4 + 16 possible words: 
+  ```{A, C, G, T, AA, AC, AG, AT, CA, CC, CG, CT, GA, GC, GG, GT, TA, TC, TG, TT}``` 
+* Sequence: GGGA
+* Decomposed into k-mers: G, G, G, A, GG, GG, GA
+* Algorithm's output:
+  ```[1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0]```
+  
 Usage:
 ```python
 from kmers import Kmers
