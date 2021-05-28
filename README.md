@@ -140,7 +140,7 @@ Example 2:
 * For _k_ in [1, 2] there are 4^1 + 4^2 = 4 + 16 possible words: 
   ```{A, C, G, T, AA, AC, AG, AT, CA, CC, CG, CT, GA, GC, GG, GT, TA, TC, TG, TT}``` 
 * Sequence: GGGA
-* Decomposed into k-mers: G, G, G, A, GG, GG, GA
+* Decomposing into k-mers: G, G, G, A, GG, GG, GA
 * Algorithm's output:
   ```[1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0]```
   
