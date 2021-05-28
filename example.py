@@ -37,7 +37,7 @@ print("*k-mers*")
 # defining list of ks
 k_start = 1
 k_end = 2
-k_values = list(range(k_start, k_end+1))
+k_values = list(range(k_start, k_end + 1))
 
 outputFile = os.path.join(folder_for_output, f"{k_start}_to_{k_end}_mers.csv")
 

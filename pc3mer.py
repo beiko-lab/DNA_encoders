@@ -1,23 +1,26 @@
-import pandas as pd
 import numpy as np
 from my_pseknc import Pseknc
 from base_for_encoders import BaseForEncoder
-import os.path as osp
 import os
 
+
 class Pc3mer(Pseknc, BaseForEncoder):
-
-
-    def __init__(self, classes=None, max_samples=1008, combine_class_samples=True,
-                 binary=True, folder_for_output=None):
-        super().__init__()
+    def __init__(
+        self,
+        classes=None,
+        max_samples=1008,
+        combine_class_samples=True,
+        binary=True,
+        folder_for_output=None,
+    ):
+        super().__init__(binary=binary)
         self.folder_for_output = folder_for_output
         self.path_db = os.path.join(self.folder_for_output, "Pc3mer")
         os.makedirs(self.path_db, exist_ok=True)
         self.combine_class_samples = combine_class_samples
 
         if classes:
-            self.classes = np.array([self.synonimous(c) for c in classes])
+            self.classes = np.array([self.synonyms(c) for c in classes])
         else:
             self.classes = None
 
@@ -27,39 +30,6 @@ class Pc3mer(Pseknc, BaseForEncoder):
             assert len(self.classes) == 2
 
         self.file_name_prefix = ""
-
-    def read_from_file(self):
-
-        promfeatures = None
-
-        for prop in self.properties:
-            features = pd.io.parsers.read_csv(os.path.join(self.path_db, self.file_name_prefix + prop + ".md"), header=None, \
-                                              index_col=0, \
-                                              low_memory=True, error_bad_lines=True, \
-                                              doublequote=False, memory_map=True, float_precision="high", \
-                                              engine='c'
-                                              )
-            if not promfeatures:
-                promfeatures = features
-            else:
-                promfeatures.merge(features.iloc[:, :-1], how='inner', left_index=True, right_index=True)
-        labels = features.iloc[:, -1]
-
-        """
-        Making indexes equal for features and labels
-        """
-        promfeatures.merge(labels, how='inner', left_index=True, right_index=True)
-
-        """
-        Grabbing the source_sequence_id, features and labels
-        """
-        source_sequence_id = promfeatures.index
-        labels = promfeatures.iloc[:, -1]
-        promfeatures = promfeatures.iloc[:, :-1]
-
-        assert promfeatures.shape[1] == 672
-
-        return source_sequence_id, promfeatures, labels
 
     def property_values_along_the_sequence(self, seq, prop_name):
         """
@@ -72,47 +42,45 @@ class Pc3mer(Pseknc, BaseForEncoder):
         :return:
         """
         seq_into_oligonucs_index, _ = self.encode_into_kmers(seq)
-        prop_as_feature = np.array(self.supInfo[prop_name]).astype(float)[seq_into_oligonucs_index]
+        prop_as_feature = np.array(self.supInfo[prop_name]).astype(float)[
+            seq_into_oligonucs_index
+        ]
         return prop_as_feature
 
-    def properties_values_along_seqs(self,seq_list,prop_name_list):
-        seqs_encoded_with_props = []
-        for p in prop_name_list:
-            seqs_encoded = []
-            for s in seq_list:
-                seqs_encoded.append(self.property_values_along_the_sequence(s,p))
-            seqs_encoded_with_props.append(np.array(seqs_encoded))
-        return np.array(seqs_encoded_with_props)
-
-    def encode_fasta_into_pseknc_physicochemical_properties(self, input_path, prop_name,L=58, append_seq_id=True,
-                                                            verbose=False):
-        file_in = open(input_path,"r")
-        sigma = ''
+    def encode_fasta_into_pseknc_physicochemical_properties(
+        self, input_path, prop_name, L=58, append_seq_id=True, verbose=False
+    ):
+        file_in = open(input_path, "r")
+        sigma = ""
         feature_vector = []
 
-        for i,line in enumerate(file_in):
+        for i, line in enumerate(file_in):
             line_encoded = []
             if line == "":
                 continue
-            elif line[0] == '>':
+            elif line[0] == ">":
                 sigma = line[1:-1]
             else:
                 if line[-1:] == "\n":
-                    line58=line[:-1]
+                    line58 = line[:-1]
                 else:
                     line58 = line
 
                 if len(line58) != L:
-                    print("Line {} has size {} instead of {}.".format(i,len(line58),L))
+                    print(
+                        "Line {} has size {} instead of {}.".format(i, len(line58), L)
+                    )
                     continue
 
-                line_encoded = list(self.property_values_along_the_sequence(line58, prop_name))
+                line_encoded = list(
+                    self.property_values_along_the_sequence(line58, prop_name)
+                )
                 if verbose:
-                    print("length da linha {}".format(len(line58)))
-                    print("length da line_encoded {}".format(len(line_encoded)))
+                    print("line length {}".format(len(line58)))
+                    print("encoded line length {}".format(len(line_encoded)))
 
                 if append_seq_id:
-                    line_encoded.append(sigma)
+                    line_encoded.append(self.synonyms(sigma))
 
             if line_encoded != []:
                 feature_vector.append(line_encoded)
