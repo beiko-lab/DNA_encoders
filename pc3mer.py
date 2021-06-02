@@ -5,14 +5,11 @@ import os
 
 
 class Pc3mer(Pseknc, BaseForEncoder):
-    def __init__(
-        self,
-        classes=None,
-        max_samples=1008,
-        combine_class_samples=True,
-        binary=True,
-        folder_for_output=None,
-    ):
+    def __init__(self, classes=None, max_samples=1008, combine_class_samples=True, folder_for_output=None):
+        if classes:
+            binary = [False if len(classes) != 2 else True for classes in [classes]][0]
+        else:
+            binary = False
         super().__init__(binary=binary)
         self.folder_for_output = folder_for_output
         self.path_db = os.path.join(self.folder_for_output, "Pc3mer")
