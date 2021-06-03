@@ -5,28 +5,32 @@ import os
 
 
 class Pc3mer(Pseknc, BaseForEncoder):
-    def __init__(self, classes=None, max_samples=1008, combine_class_samples=True, folder_for_output=None):
+    def __init__(self,
+                 classes=None,
+                 max_samples=1008,
+                 combine_class_samples=True,
+                 folder_for_output=None):
         if classes:
             binary = [False if len(classes) != 2 else True for classes in [classes]][0]
         else:
             binary = False
+
         super().__init__(binary=binary)
+
         self.folder_for_output = folder_for_output
         self.path_db = os.path.join(self.folder_for_output, "Pc3mer")
         os.makedirs(self.path_db, exist_ok=True)
         self.combine_class_samples = combine_class_samples
+        self.max_samples_per_class = max_samples
+        self.binary = binary
+        self.file_name_prefix = ""
 
         if classes:
             self.classes = np.array([self.synonyms(c) for c in classes])
+            if binary:
+                assert len(self.classes) == 2
         else:
             self.classes = None
-
-        self.max_samples_per_class = max_samples
-        self.binary = binary
-        if binary and classes:
-            assert len(self.classes) == 2
-
-        self.file_name_prefix = ""
 
     def property_values_along_the_sequence(self, seq, prop_name):
         """

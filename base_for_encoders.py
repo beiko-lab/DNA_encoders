@@ -1,5 +1,5 @@
 class BaseForEncoder:
-    def __init__(self, binary = True):
+    def __init__(self, binary=True):
         self.binary = binary
 
     def synonyms(self, class_name):
