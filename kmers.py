@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
 from itertools import product
-from base_for_encoders import BaseForEncoder
+from beiko_lab.DNA_encoders.base_for_encoders import BaseForEncoder
 
 
 class Kmers(BaseForEncoder):
-    def __init__(self, binary=True):
+    def __init__(self, binary=True, list_of_ks=[4]):
         super().__init__(binary=binary)
+        self.list_of_ks = list_of_ks
         self.oligonucs = {
             1: ["A", "C", "G", "T"],
             2: ["".join(c) for c in product("ACGT", repeat=2)],
@@ -16,22 +17,35 @@ class Kmers(BaseForEncoder):
             6: ["".join(c) for c in product("ACGT", repeat=6)],
         }
 
-    def several_k_mers(self, seq, ks):
+    def count_kmers_several_ks(self, seq, list_of_ks=None):
         """
-        :param seq:
-        :param ks: is a list of k's
-        :return:
+        Parameters
+        ----------
+        seq : str
+            DNA sequence to encode
+        list_of_ks : list
+                List of values for the k-mers encoder. The values must be integers.
+
+        Returns
+        ----------
+        feature_vector : np.ndarray
+            Array of all the encoded sequences.
         """
         feature_vector = np.array([])
-        for k in ks:
+
+        if list_of_ks is None:
+            list_of_ks = self.list_of_ks
+
+        for k in list_of_ks:
             feature_vector = np.concatenate(
-                (feature_vector, self.count_kmers(seq, k=k).values), axis=None
+                (feature_vector, self.count_kmers_single_k(seq, k=k).values), axis=None
             )
         return feature_vector.flatten()
 
-    def count_kmers(self, seq, k=3):
+    def count_kmers_single_k(self, seq, k=3):
         """
-        Count kmer occurrences in a given seq.
+        Count k-mer occurrences in a given seq.
+
         Parameters
         ----------
         seq : string
@@ -41,7 +55,8 @@ class Kmers(BaseForEncoder):
 
         Returns
         -------
-        counts : DataFrame, columns are oligonucleotides and line 0 has the # of times each oligonucleotide appears in seq
+        counts : pd.DataFrame
+            DataFrame where columns are oligonucleotides and line 0 has the # of times each oligonucleotide appears in seq
             A dictionary of counts keyed by their individual kmers (strings
             of length k).
         """
@@ -57,46 +72,73 @@ class Kmers(BaseForEncoder):
         # Loop over the kmer start positions
         for i in range(num_kmers):
             # Slice the string to get the kmer
-            kmer = seq[i : i + k]
+            kmer = seq[i: i + k]
             # Increment the count for this kmer
             dataFrame.loc[0, kmer] += 1
 
         # Return the final counts
         return dataFrame
 
-    def convertFastaIntoSeveralKmers(
-        self, fastafile, list_of_k, outputfile, add_class_to_entries=True
+    def encode_fasta_file(
+            self,
+            fastafile: str,
+            outputfile: str,
+            list_of_ks: list = None,
+            add_class_to_entries: bool = True,
+            verbose: bool = False,
     ):
         """
-        Encodes a fastafile into a feature vector of several k-mers for k in list_of_k.
+        Encodes a fastafile into a feature vector of k-mers for k in list_of_k
+        and stores it into outputfile.
 
-        :param fastafile: Each entry in this file must have 58 bp
-        :param list_of_k: List of the numbers we want k to have
-        :param outputfile:
-        :param add_class_to_entries:
-        :return:
+        Parameters
+        ----------
+        fastafile : string
+            Each entry in this file must have 58 bp
+        list_of_ks : list
+            List of the numbers we want k to have
+        outputfile : string
+            Path and file name where to store the encoded sequences
+        add_class_to_entries : boolean
+            If the sequence's label should be appended to the encoded sequence
+        verbose : boolean
+            If the print statements should be enabled
+
+        Returns
+        -------
+        None
+
         """
+        if not list_of_ks:
+            list_of_ks = self.list_of_ks
+        else:
+            self.list_of_ks = list_of_ks
+
+        print(f"Encoding {fastafile} into k-mers for k in {list_of_ks}...")
+
         fastafile = open(fastafile, "r")
         sigma = ""
         kmers_to_save_in_file = pd.DataFrame([])
-        with open(outputfile, "w") as f:
-            for line in fastafile:
-                if line[0] == ">":
-                    sigma = line[1:-1]
-                else:
-                    # count the number of oligonucleotides
-                    kmersCount = self.several_k_mers(line[:-1], list_of_k)
-                    if add_class_to_entries:
-                        kmersCount = np.concatenate(
-                            (kmersCount, np.asarray(self.synonyms(sigma)).flatten())
-                        )
-                    # save the counts for all seqs in fastafile into a file
-                    # but first keep it in memory untill the entire file is encoded
-                    a = pd.DataFrame(data=kmersCount).transpose()
-                    kmers_to_save_in_file = kmers_to_save_in_file.append(
-                        a, ignore_index=True
+        for line in fastafile:
+            if line.startswith(">"):
+                sigma = line[1:-1]
+            else:
+                # count the number of oligonucleotides
+                kmersCount = self.count_kmers_several_ks(line[:-1])
+                if add_class_to_entries:
+                    kmersCount = np.concatenate(
+                        (kmersCount, np.asarray(self.synonyms(sigma)).flatten())
                     )
-            kmers_to_save_in_file.to_csv(
-                f, header=False, index=False, line_terminator="\n"
-            )
+
+                if verbose:
+                    print(f"Seq: {line[:-1]}\nSeq_encoded: {kmersCount}")
+
+                # save the counts for all seqs in fastafile into a file
+                # but first keep it in memory until the entire file is encoded
+                a = pd.DataFrame(data=kmersCount).transpose()
+                kmers_to_save_in_file = pd.concat(
+                    [kmers_to_save_in_file, a], axis=0, ignore_index=True
+                )
+        kmers_to_save_in_file.to_csv(outputfile, header=False, index=False)
+        print(f"Encoded sequence saved at {outputfile}")
         fastafile.close()

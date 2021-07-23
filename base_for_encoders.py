@@ -20,6 +20,8 @@ class BaseForEncoder:
             if class_name in promoter:
                 return promoter[0]
         else:
+            if class_name in ["promoter", "Sigma++"]:
+                return "promoter"
             if class_name in ["Sigma19", "sigma19", 1, "1"]:
                 return "Sigma19"
             if class_name in ["Sigma24", "sigma24", 2, "2"]:

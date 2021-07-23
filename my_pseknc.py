@@ -1,5 +1,5 @@
 import numpy as np
-from base_for_encoders import BaseForEncoder
+from beiko_lab.DNA_encoders.base_for_encoders import BaseForEncoder
 
 class Pseknc(BaseForEncoder):
 
