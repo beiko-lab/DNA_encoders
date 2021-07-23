@@ -72,15 +72,16 @@ GCTGAAAATACGTTGAACGCTTACCGTCGCGATCTGTCAATGATGGTGGAGTGGTTGC
 ```
 
 Usage:
+
 ```python
-from fasta_to_pc3mer import FastaToPc3mer
+from pc3mer import Pc3mer
 import os
 
-input_fasta = "input_file.fasta" # path + file name
-folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
+input_fasta = "input_file.fasta"  # path + file name
+folder_for_output = os.path.join(os.getcwd(), "output")  # path to store the output
 
-encoder = FastaToPc3mer(folder_for_output=folder_for_output)
-encoder.convert_to_pc3mer(input_fasta)
+encoder = Pc3mer(folder_for_output=folder_for_output)
+encoder.encode_fasta_file(input_fasta, store_encode_by_indiv_prop=True)
 ```
 
 Output:
@@ -96,15 +97,16 @@ Encodes a sequence into pc3mer and then get a set of statistics over the encoded
 * variance. 
 
 Usage:
+
 ```python
-from fasta_to_pc3mer import FastaToPc3mer
+from pc3mer import Pc3mer
 import os
 
-input_fasta = "input_file.fasta" # path + file name
-folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
+input_fasta = "input_file.fasta"  # path + file name
+folder_for_output = os.path.join(os.getcwd(), "output")  # path to store the output
 
-encoder = FastaToPc3mer(folder_for_output=folder_for_output)
-encoder.convert_to_pc3mer_stats(input_fasta)
+encoder = Pc3mer(folder_for_output=folder_for_output)
+encoder.convert_fasta_file_to_pc3mer_stats(input_fasta)
 ```
 
 ## PseKNC
@@ -117,10 +119,10 @@ import os
 
 input_fasta = "input_file.fasta" # path + file name
 folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
-outputFile = os.path.join(folder_for_output, "/pseknc.csv")
+output_file = os.path.join(folder_for_output, "pseknc.csv")
 
 encoder = Pseknc()
-encoder.encode_fasta_into_pseknc(input_fasta, outputFile)
+encoder.encode_fasta_into_pseknc(input_fasta, output_file)
 ```
 
 
@@ -145,6 +147,7 @@ Example 2:
   ```[1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0]```
   
 Usage:
+
 ```python
 from kmers import Kmers
 import os
@@ -152,14 +155,14 @@ import os
 # defining list of ks
 k_start = 1
 k_end = 5
-k_values = list(range(k_start, k_end+1))
+k_values = list(range(k_start, k_end + 1))
 
-input_fasta = "input_file.fasta" # path + file name
-folder_for_output = os.path.join(os.getcwd(), "output") # path to store the output
-outputFile = os.path.join(folder_for_output, f"/{k_start}_to_{k_end}_mers.csv")
+input_fasta = "input_file.fasta"  # path + file name
+folder_for_output = os.path.join(os.getcwd(), "output")  # path to store the output
+output_file = os.path.join(folder_for_output, f"/{k_start}_to_{k_end}_mers.csv")
 
 encoder = Kmers()
-encoded = encoder.convertFastaIntoSeveralKmers(input_fasta, k_values, outputFile)
+encoder.encode_fasta_file(fastafile=input_fasta, list_of_ks=k_values, outputfile=output_file)
 ```
 
 ## References
