@@ -1,5 +1,5 @@
 import numpy as np
-from beiko_lab.DNA_encoders.my_pseknc import Pseknc
+from git.beiko_lab.DNA_encoders.my_pseknc import Pseknc
 import os
 import pandas as pd
 

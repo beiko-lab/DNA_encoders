@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from itertools import product
-from beiko_lab.DNA_encoders.base_for_encoders import BaseForEncoder
+from git.beiko_lab.DNA_encoders.base_for_encoders import BaseForEncoder
 
 
 class Kmers(BaseForEncoder):
