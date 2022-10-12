@@ -6,7 +6,7 @@ import pandas as pd
 
 class Pc3mer(Pseknc):
     def __init__(self, classes=None, binary=True, folder_for_output=None,
-                 file_name_prefix=""):
+                 file_name_prefix="", L=58):
         """
 
         :param classes:
@@ -20,7 +20,7 @@ class Pc3mer(Pseknc):
         if binary and classes:
             assert len(classes) == 2
 
-        super().__init__(binary=binary)
+        super().__init__(binary=binary, L=L)
 
         self.name = 'pc3mer'
         self.folder_for_output = folder_for_output
@@ -133,7 +133,7 @@ class Pc3mer(Pseknc):
         """
 
         print(f"Encoding {input_file_path} into pc3mer...")
-        file_in = Pc3mer.read_fasta_file(input_file_path)
+        file_in = Pc3mer.read_fasta_file(input_file_path, L=L)
 
         # path to save outputs
         if folder_for_output is None:
@@ -228,31 +228,30 @@ class Pc3mer(Pseknc):
         return feature_vector
 
     @staticmethod
-    def read_fasta_file(input_file_path):
+    def read_fasta_file(input_file_path, L=58):
         """
         Reads the file and verify if it is a valid fasta format file before
         returning it as a list of lines
         :param input_file_path:
         :return:
         """
-        if not os.path.isfile(input_file_path):
-            print("The input fasta file {} does not exist.".format(input_file_path))
-            assert False
-        else:
-            with open(input_file_path, "r") as fid:
-                file_in = fid.readlines()
+        assert os.path.isfile(input_file_path), "The input fasta file {} does not exist.".format(input_file_path)
 
-            line0 = file_in[0]
-            line1 = file_in[1][:-1]
-            fid.close()
-            if not(line0.startswith(">")) or len(line1) != 58:
-                print(
-                    "The file at {} is in wrong format. Please, change it into fasta format with sequences with 58bp".
-                        format(input_file_path)
-                )
-                assert False
-            else:
-                return file_in
+        with open(input_file_path, "r") as fid:
+            file_in = fid.readlines()
+
+        line0 = file_in[0]
+        line1 = file_in[1][:-1]
+        fid.close()
+        if not(line0.startswith(">")) or len(line1) != L:
+            print(
+                f"The file at {input_file_path} is in the wrong format. Please, change it into fasta format with"+\
+                f" sequences of {L}bp"
+            )
+            assert False, f"The file at {input_file_path} is in wrong format. Please, change it into fasta format "+\
+                    f"with sequences with {L}bp"
+        else:
+            return file_in
 
     def convert_fasta_file_to_pc3mer_stats(self, input_file_path, folder_for_output=None):
         """

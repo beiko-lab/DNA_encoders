@@ -268,7 +268,7 @@ class Pseknc(BaseForEncoder):
 
         # loop over the sequence grabbing all 3-mers
         for l in range(len(seq) - 2):
-            kmer = seq[l: l + 3]
+            kmer = seq[l: l + 3].upper()
             try:
                 # searches oligonucs for the specific kmer and return its index in that array
                 index = self.oligonucs.index(kmer)
