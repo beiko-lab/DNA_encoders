@@ -39,7 +39,7 @@ class Kmers(BaseForEncoder):
         for k in list_of_ks:
             feature_vector = np.concatenate(
                 (feature_vector, self.count_kmers_single_k(seq, k=k).values), axis=None
-            )
+            ).astype(int)
         return feature_vector.flatten()
 
     def count_kmers_single_k(self, seq, k=3):
@@ -64,7 +64,7 @@ class Kmers(BaseForEncoder):
         oligonuc = self.oligonucs[k]
         row = np.array([0] * len(oligonuc))
         row.shape = (1, len(oligonuc))
-        dataFrame = pd.DataFrame(row, columns=oligonuc)
+        dataFrame = pd.DataFrame(row, columns=oligonuc, dtype=int)
 
         # Calculate how many kmers of length k there are
         num_kmers = len(seq) - k + 1
@@ -72,7 +72,7 @@ class Kmers(BaseForEncoder):
         # Loop over the kmer start positions
         for i in range(num_kmers):
             # Slice the string to get the kmer
-            kmer = seq[i: i + k]
+            kmer = (seq[i: i + k]).upper()
             # Increment the count for this kmer
             dataFrame.loc[0, kmer] += 1
 
